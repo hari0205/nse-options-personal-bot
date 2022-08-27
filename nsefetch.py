@@ -5,7 +5,7 @@ from webbrowser import get
 import requests 
 import pandas 
 """
-First let's grab Nifty's data from nse website 
+First let's grab Nifty's data from nse website and create dataframes as per our requirements
 """
 
 url = "https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY"
@@ -26,7 +26,7 @@ response = session.get(url,headers=headers, cookies=cookies).json()
 
 
 rawdata= pandas.DataFrame(response)
-#print(rawdata)
+
 
 
 # =============================================================================
@@ -41,5 +41,38 @@ def getExpiry(rd):
 
 curexp = getExpiry(rawdata)
 
-print(curexp)
+
+# =============================================================================
+# Dataframe for all strikes PE and CE
+# Not to worry as we will be using websocket later but logic remains the same
+# =============================================================================
+
+some_data=pandas.DataFrame(rawdata['filtered']['data'])
+
+ce_df=pandas.DataFrame(some_data['CE'])
+pe_df=pandas.DataFrame(some_data['PE'])
+
+#Convert PE and CE dataframe to json for easy visualization
+# ce_df.to_json('cedata.json')
+# pe_df.to_json('pedata.json')
+
+# print (ce_df['CE'][70]['strikePrice'])
+# print (ce_df['CE'][70]['expiryDate'])
+# print (ce_df['CE'][70]['lastPrice'])
+
+for i, r in ce_df.iterrows():
+    if ce_df['CE'][i]['expiryDate'] == curexp:
+        print (ce_df['CE'][i]['strikePrice'])
+       # print (ce_df['CE'][i]['expiryDate'])
+        print(ce_df['CE'][i]['lastPrice'])
+    else:
+        print("Current expiry not found")
+        break
+
+
+
+
+
+
+
 
